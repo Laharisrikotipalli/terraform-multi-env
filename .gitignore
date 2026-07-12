@@ -8,3 +8,6 @@ tfplan
 infracost-base.json
 infracost-out.json
 crash.log
+bootstrap/.terraform/
+bootstrap/terraform.tfstate
+bootstrap/terraform.tfstate.backup
