@@ -7,6 +7,17 @@ changes.
 
 ## Architecture
 
+![Multi-environment Terraform architecture diagram](docs/architecture.svg)
+
+The diagram above shows the full flow: a developer works inside the
+containerized `iac-workspace`, pushes to GitHub, which triggers the CI/CD
+pipeline. The PR workflow plans against `staging` and posts an Infracost cost
+comment; the deploy workflow applies to `staging` automatically and to
+`production` only after a manual approval gate. Both workflows read and write
+state through the locked S3/DynamoDB backend, and the root module composes
+the `network` and `compute` modules to provision environment-scoped
+infrastructure.
+
 - **State**: S3 backend with versioning + KMS encryption, DynamoDB table for locking.
 - **Modules**: `modules/network` (VPC, subnets, IGW, NAT, route tables) and
   `modules/compute` (ALB, security groups, EC2 instances).
@@ -16,6 +27,37 @@ changes.
   plan against staging, Infracost cost comment on the PR.
 - **CD**: `.github/workflows/deploy.yml` — auto-applies to staging on merge to
   `main`; production requires manual approval via a GitHub Environment.
+
+## Requirements Checklist
+
+Verified against this repository's code, one row per core requirement:
+
+| # | Requirement | Where it's satisfied | Status |
+|---|---|---|---|
+| 1 | Remote backend + state locking | `main.tf` (`backend "s3" {}`), `backend.hcl` (bucket, `dynamodb_table`, `encrypt = true`) | ✅ |
+| 2 | Modular architecture (2+ modules) | `modules/network/`, `modules/compute/`, instantiated via `module` blocks in `main.tf` | ✅ |
+| 3 | Dynamic workspace-aware config | `terraform.workspace` referenced in `main.tf` (naming, tags) and `modules/network/main.tf` (NAT sizing) | ✅ |
+| 4 | Environment-specific `.tfvars` | `environments/dev.tfvars`, `staging.tfvars`, `production.tfvars` with differing `instance_type`/`instance_count`/`az_count` | ✅ |
+| 5 | Workspace-suffixed resource names | `local.name_prefix = "${var.project_name}-${terraform.workspace}"` used throughout modules; S3 bucket includes account ID + prefix | ✅ |
+| 6 | CI: validate + plan on PR | `.github/workflows/pr-validation.yml` — triggers on `pull_request` to `main`, runs `init`, `validate`, `plan -var-file=staging.tfvars` | ✅ |
+| 7 | CD: dynamic workspace/tfvars routing | `.github/workflows/deploy.yml` — selects `staging`/`production` workspace and passes matching `-var-file` per job | ✅ |
+| 8 | Manual approval gate for production | `deploy-production` job uses `environment: production`; gated by required reviewers configured in **Settings → Environments** | ✅ |
+| 9 | Infracost integration on PRs | `pr-validation.yml` — `terraform show -json`, `infracost breakdown`, `infracost comment github` | ✅ |
+| 10 | Containerized local workspace | `Dockerfile` (Terraform, Infracost, AWS CLI), `docker-compose.yml` (`iac-workspace`, volume mount), `.env.example` | ✅ |
+| 11 | Exposed outputs (2+) | `outputs.tf` — `vpc_id`, `public_subnet_ids`, `load_balancer_dns_name`, `app_data_bucket_name`, `instance_ids` (5 total) | ✅ |
+
+All 11 core requirements are met. Two implementation notes worth knowing
+before you present this:
+
+- **Manual approval gate (#8)** is enforced by GitHub's own `environment:`
+  protection rules, not by code in the YAML — you must add a required
+  reviewer under **Settings → Environments → production** in the actual
+  GitHub repo for the gate to be active.
+- **OIDC over static keys**: the workflows assume an IAM role via
+  `aws-actions/configure-aws-credentials` (`AWS_PLAN_ROLE_ARN` /
+  `AWS_DEPLOY_ROLE_ARN`) rather than long-lived access keys — see
+  `oidc-setup/` for the trust policy and permission documents referenced by
+  those roles.
 
 ## Prerequisites
 

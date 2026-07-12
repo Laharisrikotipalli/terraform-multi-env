@@ -1,0 +1,126 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#4A5568"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2B6CB0"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="800" fill="#FAFAFA"/>
+
+  <text x="600" y="36" text-anchor="middle" font-size="22" font-weight="700" fill="#1A202C">Multi-Environment Terraform Architecture</text>
+  <text x="600" y="58" text-anchor="middle" font-size="13" fill="#718096">Workspaces &#183; Remote State &#183; GitHub Actions &#183; Infracost</text>
+
+  <!-- Developer Workstation -->
+  <rect x="40" y="100" width="200" height="90" rx="10" fill="#EBF8FF" stroke="#3182CE" stroke-width="1.5"/>
+  <text x="140" y="132" text-anchor="middle" font-size="14" font-weight="600" fill="#2C5282">Developer Workstation</text>
+  <text x="140" y="152" text-anchor="middle" font-size="11" fill="#2C5282">Docker Compose</text>
+  <text x="140" y="168" text-anchor="middle" font-size="11" fill="#2C5282">iac-workspace container</text>
+
+  <!-- Version Control -->
+  <rect x="330" y="100" width="200" height="90" rx="10" fill="#F0FFF4" stroke="#38A169" stroke-width="1.5"/>
+  <text x="430" y="132" text-anchor="middle" font-size="14" font-weight="600" fill="#276749">Version Control</text>
+  <text x="430" y="152" text-anchor="middle" font-size="11" fill="#276749">GitHub Repository</text>
+  <text x="430" y="168" text-anchor="middle" font-size="11" fill="#276749">Pull Request &#8594; main</text>
+
+  <path d="M240,145 L330,145" stroke="#4A5568" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
+  <text x="285" y="138" text-anchor="middle" font-size="10" fill="#4A5568">git push</text>
+
+  <!-- CI/CD Pipeline container -->
+  <rect x="290" y="230" width="620" height="230" rx="10" fill="#FFFFFF" stroke="#A0AEC0" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <text x="600" y="252" text-anchor="middle" font-size="13" font-weight="700" fill="#4A5568">CI/CD Pipeline &#8212; GitHub Actions</text>
+
+  <!-- PR Workflow -->
+  <rect x="310" y="268" width="270" height="170" rx="8" fill="#FFFAF0" stroke="#DD6B20" stroke-width="1.5"/>
+  <text x="445" y="288" text-anchor="middle" font-size="12" font-weight="600" fill="#9C4221">pr-validation.yml</text>
+  <text x="445" y="306" text-anchor="middle" font-size="10.5" fill="#9C4221">fmt &#8226; init &#8226; validate</text>
+  <text x="445" y="322" text-anchor="middle" font-size="10.5" fill="#9C4221">workspace select staging</text>
+  <text x="445" y="338" text-anchor="middle" font-size="10.5" fill="#9C4221">terraform plan &#8594; tfplan</text>
+  <rect x="330" y="350" width="230" height="70" rx="6" fill="#FFF" stroke="#DD6B20" stroke-width="1"/>
+  <text x="445" y="368" text-anchor="middle" font-size="11" font-weight="600" fill="#9C4221">Infracost Estimator</text>
+  <text x="445" y="384" text-anchor="middle" font-size="10" fill="#9C4221">plan JSON &#8594; cost breakdown</text>
+  <text x="445" y="400" text-anchor="middle" font-size="10" fill="#9C4221">posts PR comment</text>
+
+  <!-- Deployment workflow -->
+  <rect x="610" y="268" width="280" height="170" rx="8" fill="#FAF5FF" stroke="#6B46C1" stroke-width="1.5"/>
+  <text x="750" y="288" text-anchor="middle" font-size="12" font-weight="600" fill="#553C9A">deploy.yml</text>
+  <text x="750" y="306" text-anchor="middle" font-size="10.5" fill="#553C9A">on push to main</text>
+
+  <rect x="628" y="316" width="240" height="34" rx="6" fill="#FFF" stroke="#6B46C1" stroke-width="1"/>
+  <text x="748" y="337" text-anchor="middle" font-size="10.5" fill="#553C9A">workspace: staging &#8594; auto-apply</text>
+
+  <path d="M748,350 L748,362" stroke="#6B46C1" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
+
+  <rect x="628" y="364" width="240" height="20" rx="4" fill="#FED7D7" stroke="#C53030" stroke-width="1"/>
+  <text x="748" y="378" text-anchor="middle" font-size="9.5" font-weight="600" fill="#822727">Manual approval gate (Environments)</text>
+
+  <path d="M748,384 L748,396" stroke="#6B46C1" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
+
+  <rect x="628" y="398" width="240" height="30" rx="6" fill="#FFF" stroke="#6B46C1" stroke-width="1"/>
+  <text x="748" y="417" text-anchor="middle" font-size="10.5" fill="#553C9A">workspace: production &#8594; apply</text>
+
+  <path d="M530,120 C620,120 620,195 600,230" stroke="#4A5568" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
+  <text x="672" y="180" text-anchor="middle" font-size="10" fill="#4A5568">triggers on PR / merge</text>
+
+  <!-- Remote State Backend -->
+  <rect x="40" y="560" width="260" height="130" rx="10" fill="#FFF5F5" stroke="#C53030" stroke-width="1.5"/>
+  <text x="170" y="584" text-anchor="middle" font-size="14" font-weight="600" fill="#822727">Remote State Backend</text>
+  <text x="170" y="608" text-anchor="middle" font-size="11" fill="#822727">S3 bucket (versioned, SSE-KMS)</text>
+  <text x="170" y="626" text-anchor="middle" font-size="11" fill="#822727">DynamoDB table &#8212; state lock</text>
+  <text x="170" y="646" text-anchor="middle" font-size="11" fill="#822727">One state file per workspace:</text>
+  <text x="170" y="662" text-anchor="middle" font-size="10.5" fill="#822727" font-family="monospace">dev / staging / production</text>
+
+  <path d="M320,438 C320,500 260,500 220,560" stroke="#4A5568" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
+  <text x="230" y="510" text-anchor="middle" font-size="10" fill="#4A5568">init / plan / apply</text>
+  <text x="230" y="524" text-anchor="middle" font-size="10" fill="#4A5568">reads &amp; writes state</text>
+
+  <path d="M140,190 C140,380 170,420 170,560" stroke="#4A5568" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow)" fill="none"/>
+  <text x="90" y="380" text-anchor="middle" font-size="10" fill="#4A5568">local terraform</text>
+  <text x="90" y="394" text-anchor="middle" font-size="10" fill="#4A5568">init / plan (dev)</text>
+
+  <!-- Module hierarchy -->
+  <rect x="360" y="560" width="260" height="130" rx="10" fill="#F7FAFC" stroke="#4A5568" stroke-width="1.5"/>
+  <text x="490" y="584" text-anchor="middle" font-size="14" font-weight="600" fill="#2D3748">Terraform Modules</text>
+  <text x="490" y="608" text-anchor="middle" font-size="11" fill="#2D3748">modules/network</text>
+  <text x="490" y="624" text-anchor="middle" font-size="10.5" fill="#4A5568">VPC, subnets, IGW, NAT, routes</text>
+  <text x="490" y="646" text-anchor="middle" font-size="11" fill="#2D3748">modules/compute</text>
+  <text x="490" y="662" text-anchor="middle" font-size="10.5" fill="#4A5568">ALB, security groups, EC2</text>
+
+  <path d="M748,438 C748,500 620,520 560,560" stroke="#2B6CB0" stroke-width="1.5" marker-end="url(#arrowBlue)" fill="none"/>
+
+  <!-- Cloud environments -->
+  <rect x="680" y="560" width="480" height="130" rx="10" fill="#EBF8FF" stroke="#2B6CB0" stroke-width="1.5"/>
+  <text x="920" y="578" text-anchor="middle" font-size="13" font-weight="600" fill="#2C5282">Cloud Provider Environment (AWS)</text>
+
+  <rect x="700" y="606" width="200" height="68" rx="8" fill="#FFF" stroke="#2B6CB0" stroke-width="1"/>
+  <text x="800" y="628" text-anchor="middle" font-size="12" font-weight="600" fill="#2C5282">Staging</text>
+  <text x="800" y="646" text-anchor="middle" font-size="10" fill="#2C5282">t3.small &#215; 3, single NAT</text>
+  <text x="800" y="660" text-anchor="middle" font-size="10" fill="#2C5282">workspace: staging</text>
+
+  <rect x="940" y="606" width="200" height="68" rx="8" fill="#FFF" stroke="#2B6CB0" stroke-width="1"/>
+  <text x="1040" y="628" text-anchor="middle" font-size="12" font-weight="600" fill="#2C5282">Production</text>
+  <text x="1040" y="646" text-anchor="middle" font-size="10" fill="#2C5282">m5.large &#215; 3, NAT per AZ</text>
+  <text x="1040" y="660" text-anchor="middle" font-size="10" fill="#2C5282">workspace: production</text>
+
+  <path d="M890,438 C890,510 800,530 800,606" stroke="#DD6B20" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
+  <path d="M890,438 C1000,510 1040,530 1040,606" stroke="#6B46C1" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
+  <text x="960" y="504" text-anchor="middle" font-size="10" fill="#4A5568">apply -var-file=*.tfvars</text>
+
+  <!-- outputs -->
+  <path d="M800,606 C650,560 350,650 300,690" stroke="#38A169" stroke-width="1.2" stroke-dasharray="3,3" fill="none"/>
+  <text x="480" y="702" text-anchor="middle" font-size="9.5" fill="#276749">outputs.tf exposes VPC ID, ALB DNS, bucket name, instance IDs</text>
+
+  <!-- legend -->
+  <rect x="40" y="730" width="14" height="14" fill="#EBF8FF" stroke="#3182CE"/>
+  <text x="60" y="741" font-size="10" fill="#4A5568">Local / Source</text>
+  <rect x="180" y="730" width="14" height="14" fill="#FFFAF0" stroke="#DD6B20"/>
+  <text x="200" y="741" font-size="10" fill="#4A5568">PR / Cost Check</text>
+  <rect x="330" y="730" width="14" height="14" fill="#FAF5FF" stroke="#6B46C1"/>
+  <text x="350" y="741" font-size="10" fill="#4A5568">Deployment</text>
+  <rect x="460" y="730" width="14" height="14" fill="#FFF5F5" stroke="#C53030"/>
+  <text x="480" y="741" font-size="10" fill="#4A5568">State &amp; Locking</text>
+  <rect x="610" y="730" width="14" height="14" fill="#EBF8FF" stroke="#2B6CB0"/>
+  <text x="630" y="741" font-size="10" fill="#4A5568">Provisioned Infra</text>
+</svg>
