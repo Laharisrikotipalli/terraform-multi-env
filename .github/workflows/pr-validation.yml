@@ -1,0 +1,72 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: pr-validation-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  TF_VERSION: "1.9.5"
+  TF_WORKSPACE_TARGET: staging
+  TF_VAR_FILE: environments/staging.tfvars
+
+jobs:
+  validate-and-plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_PLAN_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init -backend-config=backend.hcl -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Select Workspace
+        run: |
+          terraform workspace select ${{ env.TF_WORKSPACE_TARGET }} \
+            || terraform workspace new ${{ env.TF_WORKSPACE_TARGET }}
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -var-file=${{ env.TF_VAR_FILE }} -out=tfplan
+
+      - name: Convert Plan to JSON
+        run: terraform show -json tfplan > tfplan.json
+
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: Generate Infracost Estimate
+        run: infracost breakdown --path tfplan.json --format json --out-file infracost.json
+
+      - name: Post Infracost Comment
+        uses: infracost/actions/comment@v3
+        with:
+          path: infracost.json
+          behavior: update
