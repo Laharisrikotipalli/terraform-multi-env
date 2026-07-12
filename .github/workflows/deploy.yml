@@ -9,6 +9,10 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
 env:
   TF_VERSION: "1.9.5"
 
