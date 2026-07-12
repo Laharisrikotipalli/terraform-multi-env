@@ -40,14 +40,14 @@ module "main_network" {
 module "main_compute" {
   source = "./modules/compute"
 
-  environment       = local.environment
-  name_prefix       = local.name_prefix
-  vpc_id            = module.main_network.vpc_id
-  public_subnet_ids = module.main_network.public_subnet_ids
+  environment        = local.environment
+  name_prefix        = local.name_prefix
+  vpc_id             = module.main_network.vpc_id
+  public_subnet_ids  = module.main_network.public_subnet_ids
   private_subnet_ids = module.main_network.private_subnet_ids
-  instance_type     = var.instance_type
-  instance_count    = var.instance_count
-  allowed_ssh_cidrs = var.allowed_ssh_cidrs
+  instance_type      = var.instance_type
+  instance_count     = var.instance_count
+  allowed_ssh_cidrs  = var.allowed_ssh_cidrs
 }
 
 resource "aws_s3_bucket" "app_data" {
