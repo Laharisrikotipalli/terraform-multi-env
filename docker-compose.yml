@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  iac-workspace:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tf-multi-env/iac-workspace:latest
+    volumes:
+      - .:/workspace:cached
+      - tf-plugin-cache:/home/iac/.terraform.d/plugin-cache
+    working_dir: /workspace
+    env_file:
+      - .env
+    environment:
+      TF_PLUGIN_CACHE_DIR: /home/iac/.terraform.d/plugin-cache
+      TF_IN_AUTOMATION: "true"
+    command: tail -f /dev/null
+
+volumes:
+  tf-plugin-cache:

@@ -1,0 +1,10 @@
+.env
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+tfplan
+*.tfplan
+infracost-base.json
+infracost-out.json
+crash.log
