@@ -66,6 +66,7 @@ jobs:
         run: infracost breakdown --path tfplan.json --format json --out-file infracost.json
 
       - name: Post Infracost Comment
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
