@@ -143,7 +143,7 @@ resource "aws_instance" "app" {
 
   root_block_device {
     encrypted   = true
-    volume_size = 20
+    volume_size = 30
   }
 
   monitoring = var.environment == "production"
