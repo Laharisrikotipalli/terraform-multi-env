@@ -4,22 +4,61 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deploy directly to a single environment (skips the normal staging-then-production chain)"
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
 
 permissions:
   contents: read
   id-token: write
 
 concurrency:
-  group: deploy-main
+  group: deploy-${{ github.ref }}
   cancel-in-progress: false
 
 env:
   TF_VERSION: "1.9.5"
 
 jobs:
+  # Computes which environment(s) this run should touch, based on trigger
+  # context: a push to main always runs the full staging -> production
+  # chain; a manual dispatch targets only the chosen environment. This is
+  # the routing decision consumed by the deploy jobs below.
+  resolve-targets:
+    runs-on: ubuntu-latest
+    outputs:
+      run_staging: ${{ steps.resolve.outputs.run_staging }}
+      run_production: ${{ steps.resolve.outputs.run_production }}
+    steps:
+      - id: resolve
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
+              echo "run_staging=true" >> "$GITHUB_OUTPUT"
+              echo "run_production=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "run_staging=false" >> "$GITHUB_OUTPUT"
+              echo "run_production=true" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            # push to main: always run staging, then production (gated below)
+            echo "run_staging=true" >> "$GITHUB_OUTPUT"
+            echo "run_production=true" >> "$GITHUB_OUTPUT"
+          fi
+
   deploy-staging:
+    needs: resolve-targets
+    if: needs.resolve-targets.outputs.run_staging == 'true'
     runs-on: ubuntu-latest
     environment: staging
+    env:
+      TARGET_ENV: staging
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,21 +77,30 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config=backend.hcl -input=false
 
-      - name: Select Staging Workspace
+      - name: Select Workspace
         run: |
-          terraform workspace select staging \
-            || terraform workspace new staging
+          terraform workspace select "$TARGET_ENV" \
+            || terraform workspace new "$TARGET_ENV"
 
       - name: Terraform Plan
-        run: terraform plan -input=false -var-file=environments/staging.tfvars -out=tfplan
+        run: terraform plan -input=false -var-file="environments/${TARGET_ENV}.tfvars" -out=tfplan
 
       - name: Terraform Apply
         run: terraform apply -input=false -auto-approve tfplan
 
+  # Gated by the GitHub "production" Environment (see README: Repository
+  # Setup) which enforces manual review before this job is allowed to run.
   deploy-production:
-    needs: deploy-staging
+    needs: [resolve-targets, deploy-staging]
+    if: |
+      always() &&
+      needs.resolve-targets.outputs.run_production == 'true' &&
+      needs.resolve-targets.result == 'success' &&
+      (needs.deploy-staging.result == 'success' || needs.deploy-staging.result == 'skipped')
     runs-on: ubuntu-latest
     environment: production
+    env:
+      TARGET_ENV: production
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,13 +119,13 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config=backend.hcl -input=false
 
-      - name: Select Production Workspace
+      - name: Select Workspace
         run: |
-          terraform workspace select production \
-            || terraform workspace new production
+          terraform workspace select "$TARGET_ENV" \
+            || terraform workspace new "$TARGET_ENV"
 
       - name: Terraform Plan
-        run: terraform plan -input=false -var-file=environments/production.tfvars -out=tfplan
+        run: terraform plan -input=false -var-file="environments/${TARGET_ENV}.tfvars" -out=tfplan
 
       - name: Terraform Apply
         run: terraform apply -input=false -auto-approve tfplan

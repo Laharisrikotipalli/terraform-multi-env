@@ -25,8 +25,12 @@ infrastructure.
   each with its own `.tfvars` file and isolated state.
 - **CI**: `.github/workflows/pr-validation.yml` — format check, init, validate,
   plan against staging, Infracost cost comment on the PR.
-- **CD**: `.github/workflows/deploy.yml` — auto-applies to staging on merge to
-  `main`; production requires manual approval via a GitHub Environment.
+- **CD**: `.github/workflows/deploy.yml` — a `resolve-targets` job computes
+  which environment(s) to deploy from trigger context (push to `main` runs
+  staging then production; a manual `workflow_dispatch` can target either
+  environment directly). Production is additionally held behind a required
+  reviewer on the GitHub `production` Environment (see *Repository Setup*
+  below).
 
 ## How to Execute Each Tool
 
@@ -110,6 +114,33 @@ Only do this when you're certain no other run is actively applying changes.
 - Docker and Docker Compose
 - An AWS account with permission to create IAM roles, S3, DynamoDB, VPC, EC2, ELB
 - An [Infracost](https://www.infracost.io/) API key (free tier)
+
+## Repository Setup (one-time, before first deploy)
+
+The `deploy-production` job in `deploy.yml` targets the GitHub **`production`
+Environment**, but GitHub Environments do not enforce manual approval unless
+you configure a protection rule — the workflow file alone cannot turn this
+on. Before the first deploy:
+
+1. Go to **Settings → Environments** in this repository.
+2. Create (or edit) an environment named `production`.
+3. Under **Deployment protection rules**, enable **Required reviewers** and
+   add at least one reviewer/team.
+4. (Recommended) Also create a `staging` environment — even without required
+   reviewers, this lets you scope `AWS_DEPLOY_ROLE_ARN` and other secrets
+   per environment instead of repository-wide.
+
+Without step 3, `deploy-production` will apply automatically the same way
+`deploy-staging` does — the `environment:` key alone only labels the job,
+it doesn't gate it.
+
+### Triggering a deploy
+
+| Trigger | Behavior |
+|---|---|
+| Push/merge to `main` | Runs `deploy-staging` automatically, then `deploy-production` (held for review) |
+| Manual run via **Actions → Deploy → Run workflow**, `environment: staging` | Applies only to staging |
+| Manual run via **Actions → Deploy → Run workflow**, `environment: production` | Applies only to production (still held for the same required-reviewer gate) |
 
 ## Secrets Required in the Repository
 

@@ -1,0 +1,16 @@
+{
+    "Objects": [
+        {
+            "Key": "env:/dev/multi-env/terraform.tfstate",
+            "VersionId": "nnU7jI2R55vUL8pfu0.k35S_YGjnbWYK"
+        },
+        {
+            "Key": "env:/production/multi-env/terraform.tfstate",
+            "VersionId": "ML3lapmQd5JQD3T2VZewhBUR47azX.1O"
+        },
+        {
+            "Key": "env:/staging/multi-env/terraform.tfstate",
+            "VersionId": "4vNqgVsicUaXMhDl6514dMq6idRdANzn"
+        }
+    ]
+}
