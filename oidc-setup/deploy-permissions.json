@@ -148,6 +148,15 @@
       "Resource": [
         "arn:aws:s3:::acme-*-app-data-*"
       ]
+    },
+    {
+      "Sid": "StateKmsAccess",
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ],
+      "Resource": "*"
     }
   ]
 }

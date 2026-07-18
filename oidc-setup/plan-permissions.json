@@ -4,7 +4,10 @@
     {
       "Sid": "StateBucketAccess",
       "Effect": "Allow",
-      "Action": ["s3:GetObject", "s3:ListBucket"],
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
       "Resource": [
         "arn:aws:s3:::your-org-tf-multi-env-state",
         "arn:aws:s3:::your-org-tf-multi-env-state/*"
@@ -13,8 +16,21 @@
     {
       "Sid": "LockTableAccess",
       "Effect": "Allow",
-      "Action": ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:DeleteItem"],
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:DeleteItem"
+      ],
       "Resource": "arn:aws:dynamodb:us-east-1:511092105426:table/tf-multi-env-lock"
+    },
+    {
+      "Sid": "StateKmsAccess",
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ],
+      "Resource": "*"
     }
   ]
 }
