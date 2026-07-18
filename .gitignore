@@ -10,4 +10,5 @@ infracost-out.json
 crash.log
 bootstrap/.terraform/
 bootstrap/terraform.tfstate
-bootstrap/terraform.tfstate.backup
+bootstrap/terraform.tfstate.backupbootstrap/markers.json
+bootstrap/versions.json
