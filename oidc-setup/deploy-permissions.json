@@ -10,8 +10,8 @@
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::lahari-tf-multi-env-state-2026",
-        "arn:aws:s3:::lahari-tf-multi-env-state-2026/*"
+        "arn:aws:s3:::your-org-tf-multi-env-state",
+        "arn:aws:s3:::your-org-tf-multi-env-state/*"
       ]
     },
     {
