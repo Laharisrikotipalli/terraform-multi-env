@@ -31,6 +31,56 @@
         "kms:GenerateDataKey"
       ],
       "Resource": "*"
+    },
+    {
+      "Sid": "CallerIdentity",
+      "Effect": "Allow",
+      "Action": "sts:GetCallerIdentity",
+      "Resource": "*"
+    },
+    {
+      "Sid": "Ec2ReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:Describe*",
+        "ec2:Get*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "LoadBalancerReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "elasticloadbalancing:Describe*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AppDataBucketReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:GetBucketPolicy",
+        "s3:GetBucketPublicAccessBlock",
+        "s3:GetEncryptionConfiguration",
+        "s3:GetBucketTagging",
+        "s3:ListBucket",
+        "s3:GetBucketAcl",
+        "s3:GetBucketOwnershipControls",
+        "s3:GetBucketVersioning",
+        "s3:GetBucketCors",
+        "s3:GetBucketWebsite",
+        "s3:GetBucketLogging",
+        "s3:GetBucketObjectLockConfiguration",
+        "s3:GetBucketRequestPayment",
+        "s3:GetAccelerateConfiguration",
+        "s3:GetBucketLifecycleConfiguration",
+        "s3:GetReplicationConfiguration",
+        "s3:GetLifecycleConfiguration"
+      ],
+      "Resource": [
+        "arn:aws:s3:::acme-*-app-data-*"
+      ]
     }
   ]
 }
