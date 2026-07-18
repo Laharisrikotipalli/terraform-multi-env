@@ -164,4 +164,4 @@ keys, replace the `role-to-assume` step with `aws-access-key-id` /
   an ACM certificate and add an HTTPS listener before using this for real
   production traffic.
 - Root and app S3 buckets block all public access and use SSE-KMS encryption
-  by default.
+  by default.# verified Sat, Jul 18, 2026  9:10:50 AM
